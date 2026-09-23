@@ -5,58 +5,28 @@
 // Extra for Experts:
 // - describe what you did to take this project "above and beyond"
 
-let redValue = 255;
-let greenValue = 255;
-let blueValue = 255;
-let isRed = false;
-let isGreen = false;
-let isBlue = false;
+
+let button = false;
+let x = 50;
+let y = 50;
+let w = 100;
+let h = 75;
 async function setup() {
   createCanvas(windowWidth, windowHeight);
+  noStroke();
 }
 
 function draw() {
   background(220);
-  fill(redValue, greenValue, blueValue);
-  circle(width/2, height/2, 100);
+  if (button){
+    background("black");
+  }
+  rect(x,y,w,h);
+
 }
-function mouseWheel(event){
-  //Scrolling Down
-  if (event.delta > 0) {
-    if (keyIsDown("r")) {
-    console.log("down");
-    redValue -= 25
-    return false;
-    }
-    else if (keyIsDown("g")) {
-    console.log("down");
-    greenValue -= 25;
-    return false;   
-    }
-    else if (keyIsDown("b")) {
-    console.log("down");
-    blueValue -= 25;
-    return false;   
-    }   
+function mousePressed() {
+  if (mouseX > x && mouseX < x + w && mouseY > y && mouseY < y + h) {
+    button = !button;
+    circle(mouseX,mouseY,30);
   }
-  //Scrolling Up
-  else if (event.delta < 0) {
-    if (keyIsDown("r")) {
-    console.log("up");
-    redValue += 25
-    return false;
-    }
-    else if (keyIsDown("g")) {
-    console.log("up");
-    greenValue += 25;
-    return false;   
-    }
-    else if (keyIsDown("b")) {
-    console.log("up");
-    blueValue += 25;
-    return false;   
-    } 
-
-  }
-
 }
