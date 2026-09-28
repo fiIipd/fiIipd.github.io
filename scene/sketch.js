@@ -6,18 +6,18 @@
 // - https://www.youtube.com/watch?v=XOk0aGwZYn8 <- used to understand atan2
 
 let leftEyeX, rightEyeX, yForEyes;
-let GLOBAL_SIZE = 80;
-let eyeSize = GLOBAL_SIZE;
-let pupilSize = GLOBAL_SIZE/2 - GLOBAL_SIZE/10;
-let headWidth = GLOBAL_SIZE * 5;
+let globalSize = 80;
+let eyeSize = globalSize;
+let pupilSize = globalSize/2 - globalSize/10;
+let headWidth = globalSize * 5;
 let headHeight = headWidth/2;
-let mouthY = GLOBAL_SIZE / 4;
+let mouthY = globalSize / 4;
 let state = "calm";
 async function setup() {
   createCanvas(windowWidth, windowHeight);
-  strokeWeight(2);
-  leftEyeX = width/2 - GLOBAL_SIZE;
-  rightEyeX = width/2 + GLOBAL_SIZE;
+  strokeWeight(4);
+  leftEyeX = width/2 - globalSize;
+  rightEyeX = width/2 + globalSize;
   yForEyes = height/2;
   background(220);
   
