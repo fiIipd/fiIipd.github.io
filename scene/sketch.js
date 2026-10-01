@@ -16,6 +16,7 @@ let headWidth = globalSize * 5;
 let headHeight = headWidth/2;
 let mouthY = globalSize / 4;
 let state = CALM;
+let bgColor = 220;
 async function setup() {
   createCanvas(windowWidth, windowHeight);
   angleMode(DEGREES);
@@ -24,14 +25,15 @@ async function setup() {
   yForEyes = height/2;
   strokeSize = globalSize / 20;
   strokeWeight(strokeSize);
-  background(220);
   
 }
 
 async function draw() {
+  background(bgColor);
   drawFace();
   drawEye(leftEyeX, yForEyes);
   drawEye(rightEyeX, yForEyes);
+
 
 }
 function drawEye(eyeX, eyeY){
@@ -72,27 +74,48 @@ function drawFace(){
     // Right eyebrow
     arc(rightEyeX, yForEyes - (eyeSize/4 + eyeSize/16), headWidth/4, headHeight/3, 180, 0);
   }
-  else if (state === ANNOYED){
+  if (state === ANNOYED){
     arc(width/2, height/2 + eyeSize *2 , headWidth, headHeight, 200, 340);
 
     // Left eyebrow
     line(leftEyeX - eyeSize/2, yForEyes - eyeSize/2, leftEyeX + eyeSize / 2, yForEyes - eyeSize);
     // Right eyebrow
     line(rightEyeX - eyeSize/2, yForEyes - eyeSize, rightEyeX + eyeSize / 2, yForEyes - eyeSize/2);
+  }
+  if (state === ANGRY){
+    arc(width/2, height/2 + eyeSize *2 , headWidth, headHeight, 200, 340);
+
+    // Left eyebrow
+    line(leftEyeX - eyeSize/2, yForEyes - eyeSize, leftEyeX + eyeSize/2, yForEyes - eyeSize/2);
+    // Right eyebrow
+    line(rightEyeX - eyeSize/2, yForEyes - eyeSize/2, rightEyeX + eyeSize / 2, yForEyes - eyeSize);
+
+    bgColor = "red";
 
   }
 }
 function mousePressed(){
-  let distanceFromMouse = dist(mouseX, mouseY, leftEyeX, yForEyes);
   if (state === CALM){
+    distanceFromMouse = dist(mouseX, mouseY, leftEyeX, yForEyes);
+    if (distanceFromMouse <= eyeSize/2){
+      state = ANNOYED;
+    }
+    distanceFromMouse = dist(mouseX, mouseY, rightEyeX, yForEyes);
     if (distanceFromMouse <= eyeSize/2){
       state = ANNOYED;
     }
   }
-  distanceFromMouse = dist(mouseX, mouseY, rightEyeX, yForEyes);
-  if (distanceFromMouse <= eyeSize/2){
-    state = ANNOYED;
+  if (state === ANNOYED){
+    distanceFromMouse = dist(mouseX, mouseY, leftEyeX, yForEyes);
+    if (distanceFromMouse <= eyeSize/2){
+      state = ANGRY;
+    }
+    distanceFromMouse = dist(mouseX, mouseY, rightEyeX, yForEyes);
+    if (distanceFromMouse <= eyeSize/2){
+      state = ANGRY;
+    }
   }
+  
 }
 function mouseWheel(event){
   if (keyIsDown("s")){
@@ -108,6 +131,9 @@ function keyPressed(){
   if (key === "c"){
     if (state === ANNOYED){
       state = CALM;
+    }
+    else if (state === ANGRY){
+      state = ANNOYED;
     }
   }
 }
