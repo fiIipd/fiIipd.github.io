@@ -8,23 +8,15 @@
 const CALM = "calm";
 const ANNOYED = "annoyed";
 const ANGRY = "angry";
-let leftEyeX, rightEyeX, yForEyes, strokeSize;
+let eyeSize, pupilSize, headWidth, headHeight, mouthY,
+leftEyeX, rightEyeX, yForEyes, strokeSize;
 let globalSize = 80;
-let eyeSize = globalSize;
-let pupilSize = globalSize/2 - globalSize/10;
-let headWidth = globalSize * 5;
-let headHeight = headWidth/2;
-let mouthY = globalSize / 4;
 let state = CALM;
 let bgColor = 220;
 async function setup() {
   createCanvas(windowWidth, windowHeight);
   angleMode(DEGREES);
-  leftEyeX = width/2 - globalSize;
-  rightEyeX = width/2 + globalSize;
-  yForEyes = height/2;
-  strokeSize = globalSize / 20;
-  strokeWeight(strokeSize);
+  updateAllSizes();
   
 }
 
@@ -83,8 +75,8 @@ function drawFace(){
     line(rightEyeX - eyeSize/2, yForEyes - eyeSize, rightEyeX + eyeSize / 2, yForEyes - eyeSize/2);
   }
   if (state === ANGRY){
+    // frown
     arc(width/2, height/2 + eyeSize *2 , headWidth, headHeight, 200, 340);
-
     // Left eyebrow
     line(leftEyeX - eyeSize/2, yForEyes - eyeSize, leftEyeX + eyeSize/2, yForEyes - eyeSize/2);
     // Right eyebrow
@@ -94,38 +86,46 @@ function drawFace(){
 
   }
 }
-function mousePressed(){
-  if (state === CALM){
-    distanceFromMouse = dist(mouseX, mouseY, leftEyeX, yForEyes);
-    if (distanceFromMouse <= eyeSize/2){
-      state = ANNOYED;
-    }
-    distanceFromMouse = dist(mouseX, mouseY, rightEyeX, yForEyes);
-    if (distanceFromMouse <= eyeSize/2){
-      state = ANNOYED;
-    }
-  }
-  if (state === ANNOYED){
-    distanceFromMouse = dist(mouseX, mouseY, leftEyeX, yForEyes);
-    if (distanceFromMouse <= eyeSize/2){
-      state = ANGRY;
-    }
-    distanceFromMouse = dist(mouseX, mouseY, rightEyeX, yForEyes);
-    if (distanceFromMouse <= eyeSize/2){
-      state = ANGRY;
-    }
-  }
-  
+function updateAllSizes(){
+  eyeSize = globalSize;
+  pupilSize = globalSize/2 - globalSize/10;
+  headWidth = globalSize * 5;
+  headHeight = headWidth/2;
+  mouthY = globalSize / 4;
+
+  leftEyeX = width/2 - globalSize;
+  rightEyeX = width/2 + globalSize;
+  yForEyes = height/2;
+  strokeSize = globalSize / 20;
+  strokeWeight(strokeSize);
+
 }
+function mousePressed(){
+  let onLeftEye = dist(mouseX, mouseY, leftEyeX, yForEyes) <= eyeSize/2
+  let onRightEye = dist(mouseX, mouseY, rightEyeX, yForEyes) <= eyeSize/2
+  if (onLeftEye || onRightEye){
+    if (state === CALM){
+      state = ANNOYED;
+    }
+    else if (state === ANNOYED){
+      state = ANGRY;
+    }
+  }
+}
+
 function mouseWheel(event){
   if (keyIsDown("s")){
     if (event.delta > 0){
+      globalSize -= 5;
       console.log("down");
     }
     else {
+      globalSize += 5;
       console.log("up");
     }
   }
+  updateAllSizes();
+  return false;
 }
 function keyPressed(){
   if (key === "c"){
@@ -134,6 +134,7 @@ function keyPressed(){
     }
     else if (state === ANGRY){
       state = ANNOYED;
+      bgColor = 220;
     }
   }
 }
