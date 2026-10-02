@@ -2,25 +2,32 @@
 // Filip Dulic
 // Sept 22, 2026
 //
-// Extra for Experts:
 // - https://www.youtube.com/watch?v=XOk0aGwZYn8 <- used to understand atan2
+// Extra for Experts:
+// - 
 
 const CALM = "calm";
 const ANNOYED = "annoyed";
 const ANGRY = "angry";
+const CALM_TEXT = "Pretty nice day today.";
+const ANNOYED_TEXT = "Ouch! That hurt.";
+const ANGRY_TEXT = "I have had enough!";
 let eyeSize, pupilSize, headWidth, headHeight, mouthY,
-leftEyeX, rightEyeX, yForEyes, strokeSize;
+  leftEyeX, rightEyeX, yForEyes, strokeSize;
 let globalSize = 80;
 let state = CALM;
 let bgColor = 220;
-async function setup() {
+let textSentence = CALM_TEXT;
+function setup() {
   createCanvas(windowWidth, windowHeight);
   angleMode(DEGREES);
+  textAlign(CENTER);
+  textSize(50);
   updateAllSizes();
   
 }
 
-async function draw() {
+function draw() {
   background(bgColor);
   drawFace();
   drawEye(leftEyeX, yForEyes);
@@ -54,9 +61,12 @@ function drawEye(eyeX, eyeY){
   pop();
 }
 function drawFace(){
+  fill(0);
+  text(textSentence, width/2, height/4);
   fill(251, 230, 199);
   circle(width/2, height/2, headWidth);
   if (state === CALM){
+    textSentence = CALM_TEXT;
     // Draw smile
     arc(width/2, height/2 + mouthY , headWidth, headHeight, 20, 160);
 
@@ -67,6 +77,9 @@ function drawFace(){
     arc(rightEyeX, yForEyes - (eyeSize/4 + eyeSize/16), headWidth/4, headHeight/3, 180, 0);
   }
   if (state === ANNOYED){
+    textSentence = ANNOYED_TEXT;
+
+    //Draw frown
     arc(width/2, height/2 + eyeSize *2 , headWidth, headHeight, 200, 340);
 
     // Left eyebrow
@@ -75,18 +88,20 @@ function drawFace(){
     line(rightEyeX - eyeSize/2, yForEyes - eyeSize, rightEyeX + eyeSize / 2, yForEyes - eyeSize/2);
   }
   if (state === ANGRY){
+    textSentence = ANGRY_TEXT;
     // frown
     arc(width/2, height/2 + eyeSize *2 , headWidth, headHeight, 200, 340);
     // Left eyebrow
     line(leftEyeX - eyeSize/2, yForEyes - eyeSize, leftEyeX + eyeSize/2, yForEyes - eyeSize/2);
     // Right eyebrow
     line(rightEyeX - eyeSize/2, yForEyes - eyeSize/2, rightEyeX + eyeSize / 2, yForEyes - eyeSize);
-
+    // Makes background red
     bgColor = "red";
 
   }
 }
 function updateAllSizes(){
+  // Adjusts all variables when globalSize changes
   eyeSize = globalSize;
   pupilSize = globalSize/2 - globalSize/10;
   headWidth = globalSize * 5;
@@ -101,8 +116,9 @@ function updateAllSizes(){
 
 }
 function mousePressed(){
-  let onLeftEye = dist(mouseX, mouseY, leftEyeX, yForEyes) <= eyeSize/2
-  let onRightEye = dist(mouseX, mouseY, rightEyeX, yForEyes) <= eyeSize/2
+  // checks if your cursor is over one of the eyes when you click
+  let onLeftEye = dist(mouseX, mouseY, leftEyeX, yForEyes) <= eyeSize/2;
+  let onRightEye = dist(mouseX, mouseY, rightEyeX, yForEyes) <= eyeSize/2;
   if (onLeftEye || onRightEye){
     if (state === CALM){
       state = ANNOYED;
@@ -117,13 +133,12 @@ function mouseWheel(event){
   if (keyIsDown("s")){
     if (event.delta > 0){
       globalSize -= 5;
-      console.log("down");
     }
     else {
       globalSize += 5;
-      console.log("up");
     }
   }
+  globalSize = constrain(globalSize, 25, 150);
   updateAllSizes();
   return false;
 }
