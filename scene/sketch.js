@@ -4,7 +4,9 @@
 //
 // - https://www.youtube.com/watch?v=XOk0aGwZYn8 <- used to understand atan2
 // Extra for Experts:
-// - Used the mousewheel to change sizes, new functions like atan2 which I watched a video on.
+// - Used the mousewheel to change sizes, new functions like atan2 which I watched a video on, 
+// I used arc to draw smiles, frowns, and eyebrows.
+// 
 
 const CALM = "calm";
 const ANNOYED = "annoyed";
