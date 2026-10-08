@@ -5,11 +5,17 @@
 // Extra for Experts:
 // - describe what you did to take this project "above and beyond"
 
+let shape;
+
 
 async function setup() {
-  createCanvas(windowWidth, windowHeight);
+  shape = await loadModel("uploads_files_2787791_Mercedes+Benz+GLS+580.obj");
+  createCanvas(windowWidth, windowHeight, WEBGL);
 }
 
 function draw() {
   background(220);
+
+  orbitControl();
+  model(shape);
 }
