@@ -15,7 +15,7 @@ async function setup() {
 function draw() {
   background(220);
 
-  hit = collideRectCircle(100,100,50,50,mouseX - 800 ,mouseY - 800 ,100);
+  hit = collideRectCircle(0,0,100,100,mouseX - 800 ,mouseY - 800 ,100);
 
   if (hit){
     fill("red");
@@ -23,7 +23,7 @@ function draw() {
   else{
     fill(0);
   }
-  circle(mouseX - 800 ,mouseY - 800 ,100);
+  sphere();
   orbitControl();
   box(100,100,50,50);
 }
