@@ -5,25 +5,40 @@
 // Extra for Experts:
 // - describe what you did to take this project "above and beyond"
 
-let shape, hit;
+let x,y;
+let w = 50;
+let h = 100;
+let speed = 3;
+
 
 
 async function setup() {
-  createCanvas(windowWidth, windowHeight, WEBGL);
+  createCanvas(windowWidth, windowHeight);
+  x = width/2;
+  y = height/2;
 }
 
 function draw() {
   background(220);
-
-  hit = collideRectCircle(0,0,100,100,mouseX - 800 ,mouseY - 800 ,100);
-
-  if (hit){
-    fill("red");
+  showCharacter();
+  moveCharacter();
+}
+function showCharacter(){
+  rect(x,y,w,h);
+}
+function moveCharacter(){
+  if (keyIsDown('a')) {
+    x -= speed;
   }
-  else{
-    fill(0);
+  if (keyIsDown('d')) {
+    x += speed;
   }
-  sphere();
-  orbitControl();
-  box(100,100,50,50);
+
+  if (keyIsDown('w')) {
+    y -= speed;
+  }
+
+  if (keyIsDown('s')) {
+    y += speed;
+  }  
 }
