@@ -22,7 +22,6 @@ function draw() {
   background(220);
   showCharacter();
   moveCharacter();
-}
 function showCharacter(){
   rect(x,y,w,h);
 }
