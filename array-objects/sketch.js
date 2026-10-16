@@ -22,8 +22,12 @@ function draw() {
   background(220);
   showCharacter();
   moveCharacter();
+  fill(0);
+  rect(0,height-50, width, 50);
+}
 function showCharacter(){
-  rect(x,y,w,h);
+  fill("blue");
+  rect(15,height-50,w,h);
 }
 function moveCharacter(){
   if (keyIsDown('a')) {
@@ -32,12 +36,4 @@ function moveCharacter(){
   if (keyIsDown('d')) {
     x += speed;
   }
-
-  if (keyIsDown('w')) {
-    y -= speed;
-  }
-
-  if (keyIsDown('s')) {
-    y += speed;
-  }  
 }
