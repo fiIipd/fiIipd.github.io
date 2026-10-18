@@ -5,35 +5,78 @@
 // Extra for Experts:
 // - describe what you did to take this project "above and beyond"
 
-let x,y;
-let w = 50;
-let h = 100;
-let speed = 3;
+let platforms = {
+  x: 25,
+  y: 25,
+  width: 100,
+  height: 50,
+}
+
+let player = {
+  x : 5,
+  width : 50,
+  height : 100,
+  speed : 3,
+}
+
+let onGround, playerY;
+let gravity = 0.5;
+let jumpForce = player.speed* -4;
+let yVelocity = 0;
 
 
 
 async function setup() {
   createCanvas(windowWidth, windowHeight);
-  x = width/2;
-  y = height/2;
+  playerY = height - (player.width + player.height);
 }
 
 function draw() {
   background(220);
+  showGround();
   showCharacter();
   moveCharacter();
+  applyGravity();
+  checkCollisions();
+
+
+}
+function showCharacter(){
+  fill(onGround ? "blue" : "red");
+  rect(player.x,playerY,player.width,player.height);
+}
+function showGround(){ 
   fill(0);
   rect(0,height-50, width, 50);
 }
-function showCharacter(){
-  fill("blue");
-  rect(15,height-50,w,h);
-}
 function moveCharacter(){
   if (keyIsDown('a')) {
-    x -= speed;
+    player.x -= player.speed;
   }
   if (keyIsDown('d')) {
-    x += speed;
+    player.x += player.speed;
+  }
+  if (keyIsDown(' ')){
+    if (onGround){
+      // Make it jump/update to go up
+      yVelocity = jumpForce;
+    }
+  }
+}
+function applyGravity(){
+  if (!onGround){
+    // Pull downward over time
+    yVelocity += gravity;
+  }
+  // Update y position to make it fall
+  playerY += yVelocity;
+}
+function checkCollisions(){
+  // Check if player is on the ground
+    onGround = collideRectRect(player.x,playerY,player.width,player.height, 0, height-50, width, 50);
+
+    // Make it so the player does not phase through the floor
+    if (onGround){
+    yVelocity = 0;
   }
 }
