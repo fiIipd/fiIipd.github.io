@@ -5,24 +5,19 @@
 // Extra for Experts:
 // - describe what you did to take this project "above and beyond"
 
-let platform = {
-  x: 500,
-  y: 770,
-  width: 200,
-  height: 25,
-}
+let thePlatforms = [];
 
 let player = {
   x : 5,
   width : 50,
   height : 100,
-  speed : 3,
+  speed : 5,
 }
 
-let onGround, playerY, touchingPlatform,bottomY;
+let onGround, playerY, touchingPlatform, bottomY;
 let onPlatform = false;
 let gravity = 0.5;
-let jumpForce = player.speed* -4;
+let jumpForce = player.speed* -3;
 let yVelocity = 0;
 
 
@@ -35,11 +30,12 @@ async function setup() {
 function draw() {
   background(220);
   showGround();
+  spawnPlatforms();
+  displayPlatforms();
   showCharacter();
   moveCharacter();
   applyGravity();
   checkCollisions();
-  spawnPlatforms();
   
   
 }
@@ -79,14 +75,21 @@ function checkCollisions(){
   onPlatform = false;
   // Check if player is on the ground
     onGround = collideRectRect(player.x,playerY,player.width,player.height, 0, height-50, width, 50);
-    touchingPlatform = collideRectRect(player.x, playerY,player.width,player.height,
-      platform.x,platform.y,platform.width,platform.height)
 
-    if (touchingPlatform && yVelocity >= 0 && (bottomY - yVelocity <= platform.y)){
-      onPlatform = true;
-      yVelocity = 0;
-      playerY = platform.y - player.height;
-    }
+    for (let platform of thePlatforms){
+      touchingPlatform = collideRectRect(player.x, playerY, player.width, player.height, platform.x, platform.y, platform.width, platform.height);
+      if (touchingPlatform){
+        if (yVelocity > 0 && (bottomY - yVelocity <= platform.y)){
+          onPlatform = true;
+          yVelocity = 0;
+          playerY = platform.y - player.height;
+        }
+        else if (yVelocity < 0){
+          yVelocity = gravity;
+          playerY = platform.y + platform.height;
+        }
+      }
+    }    
     // Make it so the player does not phase through the floor
     if (onGround){
     yVelocity = 0;
@@ -94,6 +97,17 @@ function checkCollisions(){
   }
 }
 function spawnPlatforms(){
-  fill(0);
-  rect(platform.x, platform.y, platform.width, platform.height);
+  let somePlatform = {
+  x: 500,
+  y: 770,
+  width: 200,
+  height: 25,
+};
+  thePlatforms.push(somePlatform);
+}
+function displayPlatforms(){
+  for (let plat of thePlatforms){
+    fill(0);
+    rect(plat.x, plat.y, plat.width, plat.height);    
+  }
 }
