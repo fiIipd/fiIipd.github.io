@@ -14,28 +14,39 @@ let player = {
   speed : 5,
 }
 
-let onGround, playerY, touchingPlatform, bottomY;
+let onGround, playerY, touchingPlatform, bottomY, lavaY;
 let onPlatform = false;
 let gravity = 0.5;
-let jumpForce = player.speed* -3;
+let jumpForce = -18;
 let yVelocity = 0;
+let cameraY = 0;
+let jumps = 0;
 
 
 
 async function setup() {
   createCanvas(windowWidth, windowHeight);
+  lavaY = height;
   playerY = height - (player.width + player.height);
+
+  for (let i = 0; i < 7; i++){
+    thePlatforms.push({
+      x : random(0, width - 200),
+      y : height - 150 - i * 90,
+      width: 200,
+      height: 25,
+    })
+  }
 }
 
 function draw() {
   background(220);
-  showGround();
-  spawnPlatforms();
-  displayPlatforms();
-  showCharacter();
+  moveCamera();
+  displayWorld();
   moveCharacter();
   applyGravity();
   checkCollisions();
+  spawnPlatforms();
   
   
 }
@@ -53,12 +64,6 @@ function moveCharacter(){
   }
   if (keyIsDown('d')) {
     player.x += player.speed;
-  }
-  if (keyIsDown(' ')){
-    if (onGround || onPlatform){
-      // Make it jump/update to go up
-      yVelocity = jumpForce;
-    }
   }
 }
 function applyGravity(){
@@ -79,12 +84,13 @@ function checkCollisions(){
     for (let platform of thePlatforms){
       touchingPlatform = collideRectRect(player.x, playerY, player.width, player.height, platform.x, platform.y, platform.width, platform.height);
       if (touchingPlatform){
-        if (yVelocity > 0 && (bottomY - yVelocity <= platform.y)){
+        if (yVelocity >= 0 && (bottomY - yVelocity <= platform.y)){
           onPlatform = true;
+          jumps = 0;
           yVelocity = 0;
           playerY = platform.y - player.height;
         }
-        else if (yVelocity < 0){
+        else if (yVelocity <= 0){
           yVelocity = gravity;
           playerY = platform.y + platform.height;
         }
@@ -92,22 +98,70 @@ function checkCollisions(){
     }    
     // Make it so the player does not phase through the floor
     if (onGround){
-    yVelocity = 0;
+      jumps = 0
+      yVelocity = 0;
       playerY = height - (player.width + player.height);
   }
 }
 function spawnPlatforms(){
-  let somePlatform = {
-  x: 500,
-  y: 770,
-  width: 200,
-  height: 25,
-};
-  thePlatforms.push(somePlatform);
+  let highestY = Infinity;
+  for (let platf of thePlatforms){
+    if (platf.y < highestY){
+      highestY = platf.y;
+    }
+  }
+
+  if (highestY > cameraY - 200){
+    thePlatforms.push({
+      x: random(0, width-200),
+      y: highestY - random(70,100),
+      width: 200,
+      height: 25,
+
+    });
+  }
 }
 function displayPlatforms(){
   for (let plat of thePlatforms){
     fill(0);
     rect(plat.x, plat.y, plat.width, plat.height);    
   }
+}
+function moveCamera(){
+  if (playerY < cameraY + height/2){
+    cameraY = playerY - height/2;
+  }
+}
+function displayWorld(){
+  push();
+  translate(0, -cameraY);
+
+  showGround();
+  displayPlatforms();
+  showCharacter();
+  riseLava();
+
+  pop();
+}
+function keyPressed() {
+  if (key === " ") {
+    if (jumps < 2) {
+      if (onGround || onPlatform || jumps === 1) {
+        yVelocity = jumpForce;
+        jumps++;
+      }
+    } 
+  }
+}
+function riseLava(){
+  lavaY -= 0.8;
+   fill('orangered');
+   rect(0, lavaY, width, height * 100);
+
+   if (playerY + player.height >= lavaY){
+    noloop();
+    fill(0);
+    textSize(50);
+    text("GAME OVER", width / 2 - 150, cameraY + height / 2);
+   }
 }
