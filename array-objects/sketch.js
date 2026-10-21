@@ -5,6 +5,8 @@
 // Extra for Experts:
 // - describe what you did to take this project "above and beyond"
 
+const ALIVE = "alive";
+const DEAD = "dead";
 let thePlatforms = [];
 
 let player = {
@@ -12,7 +14,7 @@ let player = {
   width : 50,
   height : 100,
   speed : 5,
-}
+};
 
 let onGround, playerY, touchingPlatform, bottomY, lavaY;
 let onPlatform = false;
@@ -21,6 +23,7 @@ let jumpForce = -18;
 let yVelocity = 0;
 let cameraY = 0;
 let jumps = 0;
+
 
 
 
@@ -35,7 +38,7 @@ async function setup() {
       y : height - 150 - i * 90,
       width: 200,
       height: 25,
-    })
+    });
   }
 }
 
@@ -79,28 +82,28 @@ function checkCollisions(){
 
   onPlatform = false;
   // Check if player is on the ground
-    onGround = collideRectRect(player.x,playerY,player.width,player.height, 0, height-50, width, 50);
+  onGround = collideRectRect(player.x,playerY,player.width,player.height, 0, height-50, width, 50);
 
-    for (let platform of thePlatforms){
-      touchingPlatform = collideRectRect(player.x, playerY, player.width, player.height, platform.x, platform.y, platform.width, platform.height);
-      if (touchingPlatform){
-        if (yVelocity >= 0 && (bottomY - yVelocity <= platform.y)){
-          onPlatform = true;
-          jumps = 0;
-          yVelocity = 0;
-          playerY = platform.y - player.height;
-        }
-        else if (yVelocity <= 0){
-          yVelocity = gravity;
-          playerY = platform.y + platform.height;
-        }
+  for (let platform of thePlatforms){
+    touchingPlatform = collideRectRect(player.x, playerY, player.width, player.height, platform.x, platform.y, platform.width, platform.height);
+    if (touchingPlatform){
+      if (yVelocity >= 0 && bottomY - yVelocity <= platform.y){
+        onPlatform = true;
+        jumps = 0;
+        yVelocity = 0;
+        playerY = platform.y - player.height;
       }
-    }    
-    // Make it so the player does not phase through the floor
-    if (onGround){
-      jumps = 0
-      yVelocity = 0;
-      playerY = height - (player.width + player.height);
+      else if (yVelocity <= 0){
+        yVelocity = gravity;
+        playerY = platform.y + platform.height;
+      }
+    }
+  }    
+  // Make it so the player does not phase through the floor
+  if (onGround){
+    jumps = 0;
+    yVelocity = 0;
+    playerY = height - (player.width + player.height);
   }
 }
 function spawnPlatforms(){
@@ -155,13 +158,12 @@ function keyPressed() {
 }
 function riseLava(){
   lavaY -= 0.8;
-   fill('orangered');
-   rect(0, lavaY, width, height * 100);
+  fill('orangered');
+  rect(0, lavaY, width, height * 100);
 
-   if (playerY + player.height >= lavaY){
-    noloop();
+  if (playerY + player.height >= lavaY){
     fill(0);
     textSize(50);
     text("GAME OVER", width / 2 - 150, cameraY + height / 2);
-   }
+  }
 }
