@@ -16,7 +16,7 @@ let player = {
   speed : 5,
 };
 
-let onGround, playerY, touchingPlatform, bottomY, lavaY;
+let onGround, playerY, touchingPlatform, bottomY, lavaY, lavaSound;
 let onPlatform = false;
 let gravity = 0.5;
 let jumpForce = -18;
@@ -31,7 +31,7 @@ async function setup() {
   createCanvas(windowWidth, windowHeight);
   lavaY = height;
   playerY = height - (player.width + player.height);
-
+  
   for (let i = 0; i < 7; i++){
     thePlatforms.push({
       x : random(0, width - 200),
@@ -40,6 +40,7 @@ async function setup() {
       height: 25,
     });
   }
+  lavaSound = await loadSound('coin.wav');
 }
 
 function draw() {
@@ -160,6 +161,7 @@ function riseLava(){
   lavaY -= 0.8;
   fill('orangered');
   rect(0, lavaY, width, height * 100);
+  lavaSound.play();
 
   if (playerY + player.height >= lavaY){
     fill(0);
