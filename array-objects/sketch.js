@@ -16,7 +16,7 @@ let player = {
   speed : 5,
 };
 
-let onGround, playerY, touchingPlatform, bottomY, lavaY, lavaSound;
+let onGround, playerY, touchingPlatform, bottomY, lavaY, lavaSound, lavaImg;
 let onPlatform = false;
 let gravity = 0.5;
 let jumpForce = -18;
@@ -40,7 +40,9 @@ async function setup() {
       height: 25,
     });
   }
-  lavaSound = await loadSound('coin.wav');
+  lavaImg = await loadImage('lava.png');
+  lavaSound = await loadSound('lava.wav');
+  lavaSound.loop(true);
 }
 
 function draw() {
@@ -161,11 +163,14 @@ function riseLava(){
   lavaY -= 0.8;
   fill('orangered');
   rect(0, lavaY, width, height * 100);
-  lavaSound.play();
-
+  
   if (playerY + player.height >= lavaY){
     fill(0);
     textSize(50);
     text("GAME OVER", width / 2 - 150, cameraY + height / 2);
   }
+}
+function mousePressed(){
+  lavaSound.play();
+
 }
