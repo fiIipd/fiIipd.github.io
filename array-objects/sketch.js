@@ -16,14 +16,14 @@ let player = {
   speed : 5,
 };
 
-let onGround, playerY, touchingPlatform, bottomY, lavaY, lavaSound, lavaImg;
+let onGround, playerY, touchingPlatform, bottomY, lavaY, lavaSound, lavaImg,playerImg;
 let onPlatform = false;
 let gravity = 0.5;
 let jumpForce = -18;
 let yVelocity = 0;
 let cameraY = 0;
 let jumps = 0;
-
+let state = ALIVE;
 
 
 
@@ -40,6 +40,7 @@ async function setup() {
       height: 25,
     });
   }
+  playerImg = await loadImage('fox.png');
   lavaImg = await loadImage('lava.png');
   lavaSound = await loadSound('lava.wav');
   lavaSound.loop(true);
@@ -48,7 +49,16 @@ async function setup() {
 function draw() {
   background(220);
   moveCamera();
-  displayWorld();
+  push();
+  translate(0, -cameraY);
+
+  showGround();
+  displayPlatforms();
+  showCharacter();
+  riseLava();
+
+  pop();
+
   moveCharacter();
   applyGravity();
   checkCollisions();
@@ -58,7 +68,8 @@ function draw() {
 }
 function showCharacter(){
   fill(onGround ? "blue" : "red");
-  rect(player.x,playerY,player.width,player.height);
+  image(playerImg, player.x,playerY,player.width,player.height);
+  // rect(player.x,playerY,player.width,player.height);
 }
 function showGround(){ 
   fill(0);
@@ -81,6 +92,7 @@ function applyGravity(){
   playerY += yVelocity;
 }
 function checkCollisions(){
+  // Find player bottom
   bottomY = playerY + player.height;
 
   onPlatform = false;
@@ -123,7 +135,7 @@ function spawnPlatforms(){
       y: highestY - random(70,100),
       width: 200,
       height: 25,
-
+      
     });
   }
 }
@@ -162,7 +174,8 @@ function keyPressed() {
 function riseLava(){
   lavaY -= 0.8;
   fill('orangered');
-  rect(0, lavaY, width, height * 100);
+  image(lavaImg, 0, lavaY, width, height * 100);
+  // rect(0, lavaY, width, height * 100);
   
   if (playerY + player.height >= lavaY){
     fill(0);
