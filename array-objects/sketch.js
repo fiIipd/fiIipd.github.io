@@ -7,6 +7,8 @@
 
 const ALIVE = "alive";
 const DEAD = "dead";
+const RIGHT = "right";
+const LEFT = "left";
 let thePlatforms = [];
 
 let player = {
@@ -16,14 +18,19 @@ let player = {
   speed : 5,
 };
 
-let onGround, playerY, touchingPlatform, bottomY, lavaY, lavaSound, lavaImg,playerImg;
+let backgroundImg, playerImg, onGround, playerY, touchingPlatform, bottomY,
+ lavaY, lavaSound, lavaImg, lavaStartTime,
+ rightIdle, leftIdle, rightJump,leftJump,leftRun,rightRun;
 let onPlatform = false;
 let gravity = 0.5;
 let jumpForce = -18;
 let yVelocity = 0;
 let cameraY = 0;
 let jumps = 0;
+let lavaSpeed = 0.8;
+let lavaStarted = false;
 let state = ALIVE;
+let direction = RIGHT;
 
 
 
@@ -31,6 +38,7 @@ async function setup() {
   createCanvas(windowWidth, windowHeight);
   lavaY = height;
   playerY = height - (player.width + player.height);
+  lavaStartTime = millis();
   
   for (let i = 0; i < 7; i++){
     thePlatforms.push({
@@ -40,16 +48,22 @@ async function setup() {
       height: 25,
     });
   }
-  playerImg = await loadImage('fox.png');
+  backgroundImg = await loadImage('space.jpg');
+  playerImg = await loadImage('rightIdle.png');
+  rightIdle = await loadImage('rightIdle.png');
+  leftIdle = await loadImage('leftIdle.png');
+  rightRun = await loadImage('alienRight.png');
+  leftRun = await loadImage('alienLeft.png');
+  rightJump = await loadImage('rightJump.png');
+  leftJump = await loadImage('leftJump.png');
   lavaImg = await loadImage('lava.png');
   lavaSound = await loadSound('lava.wav');
   lavaSound.loop(true);
 }
 
 function draw() {
-  background(220);
+  image(backgroundImg, 0, 0, width, height);
   moveCamera();
-  push();
   translate(0, -cameraY);
 
   showGround();
@@ -57,30 +71,41 @@ function draw() {
   showCharacter();
   riseLava();
 
-  pop();
-
   moveCharacter();
   applyGravity();
   checkCollisions();
   spawnPlatforms();
   
   
-}
+} 
 function showCharacter(){
-  fill(onGround ? "blue" : "red");
+  if (!keyIsDown('a') && !keyIsDown('d') && !keyIsDown(' ') && (onGround || onPlatform)){
+    if (direction === RIGHT){
+    playerImg = rightIdle;
+    }
+    else {
+      playerImg = leftIdle; 
+    }
+  }
   image(playerImg, player.x,playerY,player.width,player.height);
-  // rect(player.x,playerY,player.width,player.height);
 }
-function showGround(){ 
+function showGround(){
+  // Spawn a black rectangle as my ground
   fill(0);
   rect(0,height-50, width, 50);
 }
 function moveCharacter(){
+  // If moving left
   if (keyIsDown('a')) {
     player.x -= player.speed;
+    playerImg = leftRun;
+    direction = LEFT;
   }
+  // If moving right
   if (keyIsDown('d')) {
     player.x += player.speed;
+    playerImg = rightRun;
+    direction = RIGHT;
   }
 }
 function applyGravity(){
@@ -96,6 +121,7 @@ function checkCollisions(){
   bottomY = playerY + player.height;
 
   onPlatform = false;
+
   // Check if player is on the ground
   onGround = collideRectRect(player.x,playerY,player.width,player.height, 0, height-50, width, 50);
 
@@ -113,7 +139,8 @@ function checkCollisions(){
         playerY = platform.y + platform.height;
       }
     }
-  }    
+  }
+
   // Make it so the player does not phase through the floor
   if (onGround){
     jumps = 0;
@@ -134,14 +161,19 @@ function spawnPlatforms(){
       x: random(0, width-200),
       y: highestY - random(70,100),
       width: 200,
-      height: 25,
-      
+      height: 25,      
     });
+  }
+
+  for (let i =thePlatforms.length - 1; i >= 0; i--){
+    if (thePlatforms[i].y > cameraY + height){
+      thePlatforms.splice(i,1);
+    }
   }
 }
 function displayPlatforms(){
   for (let plat of thePlatforms){
-    fill(0);
+    fill('grey');
     rect(plat.x, plat.y, plat.width, plat.height);    
   }
 }
@@ -162,20 +194,36 @@ function displayWorld(){
   pop();
 }
 function keyPressed() {
+  // Handle jumping/double jump
   if (key === " ") {
     if (jumps < 2) {
       if (onGround || onPlatform || jumps === 1) {
         yVelocity = jumpForce;
         jumps++;
       }
-    } 
+    }
+    // Update character image to match movement
+    if (direction === RIGHT){
+      playerImg = rightJump;
+    }
+    else{
+      playerImg = leftJump;
+    }
   }
 }
 function riseLava(){
-  lavaY -= 0.8;
-  fill('orangered');
-  image(lavaImg, 0, lavaY, width, height * 100);
-  // rect(0, lavaY, width, height * 100);
+  // Make lava rise after 3 seconds
+  if (millis() - lavaStartTime >= 3000){
+    lavaStarted = true;
+  }
+  if (lavaStarted){
+    while (lavaSpeed <= 3.5){
+      lavaSpeed += 0.008
+    }
+    lavaY -= lavaSpeed;
+  }
+  // Show lava
+  image(lavaImg, 0, lavaY, width, height * 100); 
   
   if (playerY + player.height >= lavaY){
     fill(0);
@@ -185,5 +233,4 @@ function riseLava(){
 }
 function mousePressed(){
   lavaSound.play();
-
 }
