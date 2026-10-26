@@ -5,10 +5,7 @@
 // Extra for Experts:
 // - describe what you did to take this project "above and beyond"
 
-const ALIVE = "alive";
-const DEAD = "dead";
 const RIGHT = "right";
-const LEFT = "left";
 let thePlatforms = [];
 
 let player = {
@@ -19,8 +16,8 @@ let player = {
 };
 
 let backgroundImg, playerImg, onGround, playerY, touchingPlatform, bottomY,
- lavaY, lavaSound, lavaImg, lavaStartTime,
- rightIdle, leftIdle, rightJump,leftJump,leftRun,rightRun;
+  lavaY, lavaSound, lavaImg, lavaStartTime,
+  rightIdle, leftIdle, rightJump,leftJump,leftRun,rightRun;
 let onPlatform = false;
 let gravity = 0.5;
 let jumpForce = -18;
@@ -29,7 +26,7 @@ let cameraY = 0;
 let jumps = 0;
 let lavaSpeed = 0.8;
 let lavaStarted = false;
-let state = ALIVE;
+let alive = true;
 let direction = RIGHT;
 
 
@@ -62,26 +59,28 @@ async function setup() {
 }
 
 function draw() {
-  image(backgroundImg, 0, 0, width, height);
-  moveCamera();
-  translate(0, -cameraY);
+  if(alive){
+    image(backgroundImg, 0, 0, width, height);
+    moveCamera();
+    translate(0, -cameraY);
 
-  showGround();
-  displayPlatforms();
-  showCharacter();
-  riseLava();
+    showGround();
+    displayPlatforms();
+    showCharacter();
+    riseLava();
 
-  moveCharacter();
-  applyGravity();
-  checkCollisions();
-  spawnPlatforms();
-  
+    moveCharacter();
+    applyGravity();
+    checkCollisions();
+    spawnPlatforms();
+    
+  }
   
 } 
 function showCharacter(){
   if (!keyIsDown('a') && !keyIsDown('d') && !keyIsDown(' ') && (onGround || onPlatform)){
     if (direction === RIGHT){
-    playerImg = rightIdle;
+      playerImg = rightIdle;
     }
     else {
       playerImg = leftIdle; 
@@ -182,17 +181,6 @@ function moveCamera(){
     cameraY = playerY - height/2;
   }
 }
-function displayWorld(){
-  push();
-  translate(0, -cameraY);
-
-  showGround();
-  displayPlatforms();
-  showCharacter();
-  riseLava();
-
-  pop();
-}
 function keyPressed() {
   // Handle jumping/double jump
   if (key === " ") {
@@ -218,7 +206,7 @@ function riseLava(){
   }
   if (lavaStarted){
     while (lavaSpeed <= 3.5){
-      lavaSpeed += 0.008
+      lavaSpeed += 0.008;
     }
     lavaY -= lavaSpeed;
   }
@@ -226,6 +214,7 @@ function riseLava(){
   image(lavaImg, 0, lavaY, width, height * 100); 
   
   if (playerY + player.height >= lavaY){
+    alive = false;
     fill(0);
     textSize(50);
     text("GAME OVER", width / 2 - 150, cameraY + height / 2);

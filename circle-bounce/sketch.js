@@ -28,7 +28,7 @@ function draw() {
     for (let i = 1; i <= 10;){
       fill(theCircle.r, theCircle.g, theCircle.b);
       circle(theCircle.x, theCircle.y, theCircle.radius * 2);
-       i ++
+      i ++;
     }
 
   }
