@@ -9,7 +9,7 @@
 // const SQUARE_DIMENSIONS = grid.length;      
 
 // if you are randomizing the grid
-const SQUARE_DIMENSIONS = 25;
+const SQUARE_DIMENSIONS = 10;
 let grid;
 let squareSize;
 
