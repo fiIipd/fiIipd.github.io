@@ -57,3 +57,18 @@ function randomizeGrid(cols,rows) {
   }
   return newGrid;
 }
+function mousePressed(){
+  let x = Math.floor(mouseX/squareSize);
+  let y = Math.floor(mouseY/squareSize);
+
+  console.log(x,y);
+  toggleCell(x,y);
+}
+function toggleCell(x,y) {
+  if (grid[y][x] === 0){
+    grid[y][x] = 1;
+  }
+  else if (grid[y][x] === 1){
+    grid[y][x] = 0;
+  }
+}
