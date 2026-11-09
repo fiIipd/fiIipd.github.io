@@ -14,6 +14,7 @@
 - [Images and Sound fx](loading-assets)
 - [Grid demo](grid)
 - [Rectangular Grid](rect-grid)
+- [Character Demo](character)
 
 ## Projects
 - [Interactive Scene](scene)
