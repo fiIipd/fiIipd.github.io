@@ -16,6 +16,7 @@
 - [Rectangular Grid](rect-grid)
 - [Character Demo](character)
 - [setTimeout](set-timeout)
+- [setInterval](set-interval)
 
 ## Projects
 - [Interactive Scene](scene)
