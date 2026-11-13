@@ -17,6 +17,7 @@
 - [Character Demo](character)
 - [setTimeout](set-timeout)
 - [setInterval](set-interval)
+- [2D Arrays project](2d-arrays)
 
 ## Projects
 - [Interactive Scene](scene)

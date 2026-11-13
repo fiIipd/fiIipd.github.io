@@ -86,6 +86,6 @@ function toggleCell(x,y){
     else if (grid[y][x] === 1){
       grid[y][x] = 0;
     }
-}
+  }
 }
 
