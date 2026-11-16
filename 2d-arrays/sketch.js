@@ -5,9 +5,10 @@
 // Extra for Experts:
 // - describe what you did to take this project "above and beyond"
 
-let grid = [['blue','red'],
-            ['green', 'yellow']];
+let grid = [[0,0],
+            [0, 0]];
 
+let combination = [];
 let squareSize = 200;
 let squareColor;
 async function setup() {
@@ -34,6 +35,9 @@ function showGrid(){
       else if (grid[y][x] === 'yellow'){
         fill('yellow');        
       }
+      else if (grid[y][x] === 0){
+        fill(255);
+      }
       square(x*squareSize ,y*squareSize, squareSize);
     }
   }
@@ -43,4 +47,30 @@ function mousePressed(){
   let x = Math.floor(mouseX/squareSize);
   let y = Math.floor(mouseY/squareSize);
   console.log(x,y);
+  changeColor(x,y);
+  randomCombo();
+}
+
+function changeColor(x,y){
+  if (y === 0 && x === 0){
+    grid[y][x] = "red";
+  }
+  else if (y === 0 && x === 1){
+    grid[y][x] = "blue";
+  }
+  else if (y === 1 && x === 0){
+    grid[y][x] = "green";
+  }
+  else if (y === 1 && x === 1){
+    grid[y][x] = "yellow";
+  }
+}
+
+function randomCombo(){
+  if (random(100) < 25){
+    console.log('red');
+  }
+  else if (random(100) > 25){
+    console.log('blue');
+  }
 }

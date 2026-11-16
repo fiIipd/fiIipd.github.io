@@ -18,6 +18,9 @@ function draw() {
   circle(width/2, height/2, 400);
 }
 
+function mousePressed(){
+  
+}
 function changeColor(){
   theColor = color(random(255), random(255), random(255));
 }
