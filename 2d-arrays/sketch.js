@@ -67,10 +67,17 @@ function changeColor(x,y){
 }
 
 function randomCombo(){
-  if (random(100) < 25){
+  let choice = random(100);
+  if (choice < 25){
     console.log('red');
   }
-  else if (random(100) > 25){
+  else if (choice > 25 && choice < 50){
     console.log('blue');
+  }
+  else if (choice > 50 && choice < 75){
+    console.log('green');
+  }
+  else if (choice > 75 && choice < 100){
+    console.log('yellow');
   }
 }
