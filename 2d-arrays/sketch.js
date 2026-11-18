@@ -12,14 +12,17 @@ const YELLOW = "yellow";
 
 
 let grid = [[0,0],
-            [0, 0]];
+[0, 0]];
 
 let combination = [];
 let squareSize = 200;
 let squareColor;
 let squarePicked;
+let rightSquare = false;
+let i = 0;
 async function setup() {
   createCanvas(windowWidth, windowHeight);
+  combination.push(RED);
 }
 
 function draw() {
@@ -55,6 +58,7 @@ function mousePressed(){
   let y = Math.floor(mouseY/squareSize);
   console.log(x,y);
   changeColor(x,y);
+  correctSquare(x,y);
   randomCombo();
 }
 
@@ -82,21 +86,38 @@ function changeColor(x,y){
 }
 
 function randomCombo(){
-  let choice = random(100);
-  if (choice < 25){
-    combination.push('red');
-    // console.log('red');
+  if (rightSquare){
+    let choice = random(100);
+    if (choice < 25){
+      combination.push(RED);
+      i++;
+      // console.log('red');
+    }
+    else if (choice > 25 && choice < 50){
+      combination.push(BLUE);
+      i++;
+      // console.log('blue');
+    }
+    else if (choice > 50 && choice < 75){
+      combination.push(GREEN);
+      i++;
+      // console.log('green');
+    }
+    else if (choice > 75 && choice < 100){
+      combination.push(YELLOW);
+      i++;
+      // console.log('yellow');
+    }
   }
-  else if (choice > 25 && choice < 50){
-    combination.push('blue');
-    // console.log('blue');
+}
+
+function correctSquare(x,y){
+  console.log(combination[i]);
+  if (grid[y][x] === combination[i]){
+    rightSquare = true;
   }
-  else if (choice > 50 && choice < 75){
-    combination.push('green');
-    // console.log('green');
+  else {
+    rightSquare = false;
   }
-  else if (choice > 75 && choice < 100){
-    combination.push('yellow');
-    // console.log('yellow');
-  }
+
 }
