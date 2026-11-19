@@ -12,22 +12,27 @@ const YELLOW = "yellow";
 
 
 let grid = [[0,0],
-[0, 0]];
+            [0, 0]];
 
 let combination = [];
 let squareSize = 200;
 let squareColor;
 let squarePicked;
+let colorText;
 let rightSquare = false;
 let i = 0;
 async function setup() {
   createCanvas(windowWidth, windowHeight);
   combination.push(RED);
+  colorText = RED;
 }
 
 function draw() {
   background(220);
   showGrid();
+  fill(0);
+  textSize(50);
+  text(`${colorText}`, width/2, height/2);
 }
 
 function showGrid(){
@@ -90,21 +95,25 @@ function randomCombo(){
     let choice = random(100);
     if (choice < 25){
       combination.push(RED);
+      colorText = RED;
       i++;
       // console.log('red');
     }
     else if (choice > 25 && choice < 50){
       combination.push(BLUE);
+      colorText = BLUE;
       i++;
       // console.log('blue');
     }
     else if (choice > 50 && choice < 75){
       combination.push(GREEN);
+      colorText = GREEN;
       i++;
       // console.log('green');
     }
     else if (choice > 75 && choice < 100){
       combination.push(YELLOW);
+      colorText = YELLOW;
       i++;
       // console.log('yellow');
     }
