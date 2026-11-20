@@ -21,7 +21,20 @@ let squarePicked;
 let colorText;
 let rightSquare = false;
 let i = 0;
+let firstGrid;
+let firstGridlines;
+let secondGrid;
+let secondGridLines;
 async function setup() {
+  firstGrid = "2x2.txt";
+  secondGrid = "3x3.txt";
+  
+  firstGridlines = await loadStrings(firstGrid);
+  secondGridLines = await loadStrings(secondGrid);
+  
+  console.log(firstGridlines);
+  console.log(secondGridLines);
+  
   createCanvas(windowWidth, windowHeight);
   combination.push(RED);
   colorText = RED;
@@ -128,5 +141,4 @@ function correctSquare(x,y){
   else {
     rightSquare = false;
   }
-
 }
