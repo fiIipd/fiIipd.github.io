@@ -22,6 +22,9 @@ let colorText;
 let rightSquare = false;
 let i = 0;
 
+let isFlashing = true;;
+let flashTimer = 0;
+let flashIndex = 0;
 let flashStartTime = 0;
 let flashDuration = 750;
 let activeSquare = null;
@@ -43,11 +46,15 @@ async function setup() {
   createCanvas(windowWidth, windowHeight);
   combination.push(RED);
   colorText = RED;
+  isFlashing = true;
+  flashIndex = 0;
+  flashTimer = millis();
 }
 
 function draw() {
   background(220);
   checkColorFlashTime();
+  flashCombination();
   showGrid();
   fill(0);
   textSize(50);
@@ -60,16 +67,16 @@ function showGrid(){
       if (grid[y][x] === BLUE){
         fill(BLUE);
       }
-      else if (grid[y][x] === RED){
+      if (grid[y][x] === RED){
         fill(RED);
       }
-      else if (grid[y][x] === GREEN){
+       if (grid[y][x] === GREEN){
         fill(GREEN);
       }
-      else if (grid[y][x] === YELLOW){
+       if (grid[y][x] === YELLOW){
         fill(YELLOW);        
       }
-      else if (grid[y][x] === 0){
+       if (grid[y][x] === 0){
         fill('white');
       }
       square(x*squareSize ,y*squareSize, squareSize);
@@ -78,6 +85,9 @@ function showGrid(){
 } 
 
 function mousePressed(){
+  if (isFlashing){
+    return null;
+  }
   let x = Math.floor(mouseX/squareSize);
   let y = Math.floor(mouseY/squareSize);
   console.log(x,y);
@@ -128,6 +138,9 @@ function randomCombo(){
     let nextColor = random([RED, BLUE, GREEN, YELLOW]);
     combination.push(nextColor);
     colorText = nextColor;
+    isFlashing = true;
+    flashIndex = 0;
+    flashTimer = millis();
     i++;
   }
 }
@@ -155,5 +168,43 @@ function resetGame(){
   let nextColor = random([RED, BLUE, GREEN, YELLOW]);
   combination.push(nextColor);
   colorText = nextColor;
-  i++;
+  isFlashing = true;
+  flashIndex = 0;
+  flashTimer = millis();
+  // i++;
+}
+
+function flashCombination(){
+  if (!isFlashing){
+    return null;
+  }
+  let timeElapsed = millis() - flashTimer;
+  let whichColor = combination[flashIndex];
+
+  if (timeElapsed < 500){
+    if (whichColor === RED){
+      grid[0][0] = RED;
+    }
+    if (whichColor === BLUE){
+      grid[0][1] = BLUE;
+    }
+    if (whichColor === GREEN){
+      grid[1][0] = GREEN;
+    }
+    if (whichColor === YELLOW){
+      grid[1][1] = YELLOW;
+    }
+  }
+  else if (timeElapsed < 750){
+    grid = [[0,0], [0,0]];
+  }
+  else {
+    flashIndex++;
+    flashTimer = millis();
+
+    if (flashIndex >= combination.length){
+      isFlashing = false;
+    }
+  }
+
 }
