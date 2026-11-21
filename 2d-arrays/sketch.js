@@ -21,6 +21,11 @@ let squarePicked;
 let colorText;
 let rightSquare = false;
 let i = 0;
+
+let flashStartTime = 0;
+let flashDuration = 750;
+let activeSquare = null;
+
 let firstGrid;
 let firstGridlines;
 let secondGrid;
@@ -42,6 +47,7 @@ async function setup() {
 
 function draw() {
   background(220);
+  checkColorFlashTime();
   showGrid();
   fill(0);
   textSize(50);
@@ -75,9 +81,23 @@ function mousePressed(){
   let x = Math.floor(mouseX/squareSize);
   let y = Math.floor(mouseY/squareSize);
   console.log(x,y);
-  changeColor(x,y);
-  correctSquare(x,y);
-  randomCombo();
+
+  if (x >= 0 && x < grid[0].length && y >= 0 && y < grid.length){
+    if (activeSquare !== null){
+      grid[activeSquare.y][activeSquare.x] = 0;
+    }
+    changeColor(x,y);
+  
+    activeSquare = {x: x, y: y};
+    flashStartTime = millis();
+    correctSquare(x,y);
+    if (rightSquare){
+      randomCombo();
+    }
+    else {
+      resetGame();
+    }
+  }
 }
 
 function changeColor(x,y){
@@ -105,31 +125,10 @@ function changeColor(x,y){
 
 function randomCombo(){
   if (rightSquare){
-    let choice = random(100);
-    if (choice < 25){
-      combination.push(RED);
-      colorText = RED;
-      i++;
-      // console.log('red');
-    }
-    else if (choice > 25 && choice < 50){
-      combination.push(BLUE);
-      colorText = BLUE;
-      i++;
-      // console.log('blue');
-    }
-    else if (choice > 50 && choice < 75){
-      combination.push(GREEN);
-      colorText = GREEN;
-      i++;
-      // console.log('green');
-    }
-    else if (choice > 75 && choice < 100){
-      combination.push(YELLOW);
-      colorText = YELLOW;
-      i++;
-      // console.log('yellow');
-    }
+    let nextColor = random([RED, BLUE, GREEN, YELLOW]);
+    combination.push(nextColor);
+    colorText = nextColor;
+    i++;
   }
 }
 
@@ -141,4 +140,20 @@ function correctSquare(x,y){
   else {
     rightSquare = false;
   }
+}
+
+function checkColorFlashTime(){
+  if (activeSquare !== null && millis() - flashStartTime >= flashDuration){
+    grid[activeSquare.y][activeSquare.x] = 0;
+    activeSquare = null;
+  }
+}
+
+function resetGame(){
+  combination = [];
+  i = 0;
+  let nextColor = random([RED, BLUE, GREEN, YELLOW]);
+  combination.push(nextColor);
+  colorText = nextColor;
+  i++;
 }
