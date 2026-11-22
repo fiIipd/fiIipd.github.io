@@ -181,7 +181,7 @@ function flashCombination(){
   let timeElapsed = millis() - flashTimer;
   let whichColor = combination[flashIndex];
 
-  if (timeElapsed < 500){
+  if (timeElapsed < 750){
     if (whichColor === RED){
       grid[0][0] = RED;
     }
@@ -195,7 +195,7 @@ function flashCombination(){
       grid[1][1] = YELLOW;
     }
   }
-  else if (timeElapsed < 750){
+  else if (timeElapsed < 1000){
     grid = [[0,0], [0,0]];
   }
   else {
