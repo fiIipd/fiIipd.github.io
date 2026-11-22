@@ -43,9 +43,6 @@ async function setup() {
   firstGridlines = await loadStrings(firstGrid);
   secondGridLines = await loadStrings(secondGrid);
   
-  console.log(firstGridlines);
-  console.log(secondGridLines);
-  
   createCanvas(windowWidth, windowHeight);
   combination.push(RED);
   wordText = RED;
@@ -60,12 +57,11 @@ function draw() {
   checkNextRoundDelay();
   flashCombination();
   showGrid();
-  fill(0);
-  textSize(50);
-  text(`${wordText}`, width/2, height/2);
+  showText();
 }
 
 function showGrid(){
+  // Go through the grid and look at what colors to use
   for (let y=0; y < grid.length; y++){
     for (let x = 0; x < grid[y].length; x++){
       if (grid[y][x] === BLUE){
@@ -83,31 +79,37 @@ function showGrid(){
        if (grid[y][x] === 0){
         fill('white');
       }
+      // Show the square
       square(x*squareSize ,y*squareSize, squareSize);
     }
   }
 } 
 
 function mousePressed(){
+  // If colors flashing or waiting for the next round, clicks do nothing
   if (isFlashing || waitingForRound){
     return null;
   }
+
+  // Find where the player is clicking
   let x = Math.floor(mouseX/squareSize);
   let y = Math.floor(mouseY/squareSize);
   console.log(x,y);
 
-  if (x >= 0 && x < grid[0].length && y >= 0 && y < grid.length){
+
+  if (x >= 0 && x < grid[0].length && y >= 0 && y < grid.length){ //Only allow clicking inside of squares
+    // If active square is not empty
     if (activeSquare !== null){
       grid[activeSquare.y][activeSquare.x] = 0;
     }
     changeColor(x,y);
   
-    activeSquare = {x: x, y: y};
+    activeSquare = {x: x, y: y}; // Make active square wherever you clicked
     flashStartTime = millis();
     correctSquare(x,y);
     if (rightSquare){
-      playerStep++;
-      if (playerStep >= combination.length){
+      playerStep++;//Next step to click
+      if (playerStep >= combination.length){//Check if player clicked through whole combo
         waitingForRound = true;
         roundDelayTime = millis();
       }
@@ -119,6 +121,7 @@ function mousePressed(){
 }
 
 function changeColor(x,y){
+  // Check what square is pressed and set the color value for showGrid()
   if (y === 0 && x === 0){
     grid[y][x] = RED;
     squarePicked = RED;
@@ -142,9 +145,11 @@ function changeColor(x,y){
 }
 
 function randomCombo(){
+  // Choose a random color to push into the combination
   if (rightSquare){
     let nextColor = random([RED, BLUE, GREEN, YELLOW]);
     combination.push(nextColor);
+    // Reset variables
     playerStep = 0;
     wordText = nextColor;
     isFlashing = true;
@@ -228,5 +233,13 @@ function checkNextRoundDelay(){
 }
 
 function clearGrid(){
+  // Resets grid to full white
   grid = [[0,0], [0,0]];
+}
+
+function showText(){
+  // Shows text with preferences
+  fill(0);
+  textSize(50);
+  text(`${wordText}`, width/2, height/2);
 }
