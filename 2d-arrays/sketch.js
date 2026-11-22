@@ -18,16 +18,19 @@ let combination = [];
 let squareSize = 200;
 let squareColor;
 let squarePicked;
-let colorText;
+let wordText;
 let rightSquare = false;
-let i = 0;
+let playerStep = 0;
 
 let isFlashing = true;;
 let flashTimer = 0;
-let flashIndex = 0;
+let flashStep = 0;
 let flashStartTime = 0;
 let flashDuration = 750;
 let activeSquare = null;
+
+let waitingForRound = false;
+let roundDelayTime = 0;
 
 let firstGrid;
 let firstGridlines;
@@ -45,20 +48,21 @@ async function setup() {
   
   createCanvas(windowWidth, windowHeight);
   combination.push(RED);
-  colorText = RED;
+  wordText = RED;
   isFlashing = true;
-  flashIndex = 0;
+  flashStep = 0;
   flashTimer = millis();
 }
 
 function draw() {
   background(220);
   checkColorFlashTime();
+  checkNextRoundDelay();
   flashCombination();
   showGrid();
   fill(0);
   textSize(50);
-  text(`${colorText}`, width/2, height/2);
+  text(`${wordText}`, width/2, height/2);
 }
 
 function showGrid(){
@@ -85,7 +89,7 @@ function showGrid(){
 } 
 
 function mousePressed(){
-  if (isFlashing){
+  if (isFlashing || waitingForRound){
     return null;
   }
   let x = Math.floor(mouseX/squareSize);
@@ -102,7 +106,11 @@ function mousePressed(){
     flashStartTime = millis();
     correctSquare(x,y);
     if (rightSquare){
-      randomCombo();
+      playerStep++;
+      if (playerStep >= combination.length){
+        waitingForRound = true;
+        roundDelayTime = millis();
+      }
     }
     else {
       resetGame();
@@ -137,17 +145,17 @@ function randomCombo(){
   if (rightSquare){
     let nextColor = random([RED, BLUE, GREEN, YELLOW]);
     combination.push(nextColor);
-    colorText = nextColor;
+    playerStep = 0;
+    wordText = nextColor;
     isFlashing = true;
-    flashIndex = 0;
+    flashStep = 0;
     flashTimer = millis();
-    i++;
   }
 }
 
 function correctSquare(x,y){
-  console.log(combination[i]);
-  if (grid[y][x] === combination[i]){
+  console.log(combination[playerStep]);
+  if (grid[y][x] === combination[playerStep]){
     rightSquare = true;
   }
   else {
@@ -163,15 +171,17 @@ function checkColorFlashTime(){
 }
 
 function resetGame(){
+  clearGrid();
+  activeSquare = null;
   combination = [];
-  i = 0;
+  playerStep = 0;
   let nextColor = random([RED, BLUE, GREEN, YELLOW]);
   combination.push(nextColor);
-  colorText = nextColor;
+  wordText = nextColor;
   isFlashing = true;
-  flashIndex = 0;
+  flashStep = 0;
   flashTimer = millis();
-  // i++;
+
 }
 
 function flashCombination(){
@@ -179,7 +189,7 @@ function flashCombination(){
     return null;
   }
   let timeElapsed = millis() - flashTimer;
-  let whichColor = combination[flashIndex];
+  let whichColor = combination[flashStep];
 
   if (timeElapsed < 750){
     if (whichColor === RED){
@@ -196,15 +206,27 @@ function flashCombination(){
     }
   }
   else if (timeElapsed < 1000){
-    grid = [[0,0], [0,0]];
+    clearGrid();
   }
   else {
-    flashIndex++;
+    flashStep++;
     flashTimer = millis();
 
-    if (flashIndex >= combination.length){
+    if (flashStep >= combination.length){
       isFlashing = false;
     }
   }
+}
 
+function checkNextRoundDelay(){
+  if (waitingForRound && millis() - roundDelayTime >= 1000){
+    waitingForRound = false;
+    clearGrid();
+    activeSquare = null;
+    randomCombo();
+  }
+}
+
+function clearGrid(){
+  grid = [[0,0], [0,0]];
 }
