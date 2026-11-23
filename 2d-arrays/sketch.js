@@ -145,23 +145,7 @@ function mousePressed(){
     activeSquare = {x: x, y: y}; // Make active square wherever you clicked
     flashStartTime = millis();
     correctSquare(x,y);
-    if (rightSquare){
-      playColorSound(squarePicked);
-      playerStep++;//Next step to click
-      if (playerStep >= combination.length){//Check if player clicked through whole combo
-        waitingForRound = true;
-        roundDelayTime = millis();
-        wordText = 'Good job!';
-        score++;
-        if (score > highscore){
-          highscore = score;
-        }
-      }
-    }
-    else {
-      wrongSound.play();
-      resetGame();
-    }
+    checkPlayerChoice();
   }
 }
 
@@ -402,4 +386,24 @@ function playColorSound(color) {
     clickSound.stop();
   }
   clickSound.play();
+}
+
+function checkPlayerChoice(){
+  if (rightSquare){
+    playColorSound(squarePicked);
+    playerStep++;//Next step to click
+    if (playerStep >= combination.length){//Check if player clicked through whole combo
+      waitingForRound = true;
+      roundDelayTime = millis();
+      wordText = 'Good job!';
+      score++;
+      if (score > highscore){
+        highscore = score;
+      }
+    }
+  }
+  else {
+    wrongSound.play();
+    resetGame();
+  }
 }
