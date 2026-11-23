@@ -94,10 +94,10 @@ function showGrid(){
       if (grid[y][x] === RED){
         fill(RED);
       }
-       if (grid[y][x] === GREEN){
+      if (grid[y][x] === GREEN){
         fill(GREEN);
       }
-       if (grid[y][x] === YELLOW){
+      if (grid[y][x] === YELLOW){
         fill(YELLOW);        
       }
 
@@ -108,16 +108,16 @@ function showGrid(){
       if (grid[y][x] === CYAN){
         fill(CYAN);
       }
-       if (grid[y][x] === PURPLE){
+      if (grid[y][x] === PURPLE){
         fill(PURPLE);
       }
-       if (grid[y][x] === PINK){
+      if (grid[y][x] === PINK){
         fill(PINK);        
       }
-       if (grid[y][x] === BROWN){
+      if (grid[y][x] === BROWN){
         fill(BROWN);
       }
-       if (grid[y][x] === '0'){
+      if (grid[y][x] === '0'){
         fill(WHITE);
       }
 
@@ -165,7 +165,7 @@ function changeColor(x,y){
     grid[y][x] = BLUE;
     squarePicked = BLUE;
   }
-   if (y === 1 && x === 0){
+  if (y === 1 && x === 0){
     grid[y][x] = GREEN;
     squarePicked = GREEN;
   }
