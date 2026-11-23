@@ -1,21 +1,31 @@
-// 2d arrays
-// Your Name
-// Date
+// Memory Matching game
+// Filip Dulic
+// November 22 2026
 //
 // Extra for Experts:
-// - describe what you did to take this project "above and beyond"
+// - I loaded my 2x2 and 3x3 grids from external text files, I explored using .rate() on my sound file so I could get all 9 sounds from 1 file,
+// I expanded my knowledge of millis() to make it flash colors and not repeat the sound effects 60 times per second,
+//  I used the min() function instead of if/else to find the biggest squares possible,
+// Added the option to instantly switch modes and rebuild the grid with new colors
 
+// 2x2 colors
 const RED = "red";
 const BLUE = "blue";
 const GREEN = "green";
 const YELLOW = "yellow";
+const WHITE = 'white';
 
+// Additional 3x3 colors
+const PINK = 'pink';
+const BROWN = "brown";
+const ORANGE = 'orange';
+const CYAN = "cyan";
+const PURPLE = 'purple';
 
-let grid = [[0,0],
-            [0, 0]];
+let grid = [];
 
 let combination = [];
-let squareSize = 200;
+let squareSize;
 let squareColor;
 let squarePicked;
 let wordText;
@@ -36,19 +46,28 @@ let firstGrid;
 let firstGridlines;
 let secondGrid;
 let secondGridLines;
+let currentGridLines;
+
+let score = 0;
+let highscore = 0;
+
+let clickSound;
+let wrongSound;
+let lastFlashedStep = -1;
 async function setup() {
   firstGrid = "2x2.txt";
   secondGrid = "3x3.txt";
   
+  clickSound = await loadSound('boop.wav');
+  wrongSound = await loadSound('buzzer.wav');
   firstGridlines = await loadStrings(firstGrid);
   secondGridLines = await loadStrings(secondGrid);
   
+  currentGridLines = firstGridlines;
+  clearGrid();
   createCanvas(windowWidth, windowHeight);
-  combination.push(RED);
-  wordText = RED;
-  isFlashing = true;
-  flashStep = 0;
-  flashTimer = millis();
+  squareSize = min(windowWidth,windowHeight) / grid.length;
+  randomCombo();
 }
 
 function draw() {
@@ -64,6 +83,8 @@ function showGrid(){
   // Go through the grid and look at what colors to use
   for (let y=0; y < grid.length; y++){
     for (let x = 0; x < grid[y].length; x++){
+      fill(WHITE);
+      // ------2x2 colors------
       if (grid[y][x] === BLUE){
         fill(BLUE);
       }
@@ -76,9 +97,27 @@ function showGrid(){
        if (grid[y][x] === YELLOW){
         fill(YELLOW);        
       }
-       if (grid[y][x] === 0){
-        fill('white');
+
+      // ----3x3 colors------
+      if (grid[y][x] === ORANGE){
+        fill(ORANGE);
       }
+      if (grid[y][x] === CYAN){
+        fill(CYAN);
+      }
+       if (grid[y][x] === PURPLE){
+        fill(PURPLE);
+      }
+       if (grid[y][x] === PINK){
+        fill(PINK);        
+      }
+       if (grid[y][x] === BROWN){
+        fill(BROWN);
+      }
+       if (grid[y][x] === '0'){
+        fill(WHITE);
+      }
+
       // Show the square
       square(x*squareSize ,y*squareSize, squareSize);
     }
@@ -94,13 +133,12 @@ function mousePressed(){
   // Find where the player is clicking
   let x = Math.floor(mouseX/squareSize);
   let y = Math.floor(mouseY/squareSize);
-  console.log(x,y);
 
 
   if (x >= 0 && x < grid[0].length && y >= 0 && y < grid.length){ //Only allow clicking inside of squares
     // If active square is not empty
     if (activeSquare !== null){
-      grid[activeSquare.y][activeSquare.x] = 0;
+      grid[activeSquare.y][activeSquare.x] = '0';
     }
     changeColor(x,y);
   
@@ -108,13 +146,20 @@ function mousePressed(){
     flashStartTime = millis();
     correctSquare(x,y);
     if (rightSquare){
+      playColorSound(squarePicked);
       playerStep++;//Next step to click
       if (playerStep >= combination.length){//Check if player clicked through whole combo
         waitingForRound = true;
         roundDelayTime = millis();
+        wordText = 'Good job!';
+        score++;
+        if (score > highscore){
+          highscore = score;
+        }
       }
     }
     else {
+      wrongSound.play();
       resetGame();
     }
   }
@@ -122,44 +167,73 @@ function mousePressed(){
 
 function changeColor(x,y){
   // Check what square is pressed and set the color value for showGrid()
-  if (y === 0 && x === 0){
+
+  // ------2x2 colors------
+  if (y === 0 && x === 0){//Red
     grid[y][x] = RED;
     squarePicked = RED;
-    console.log(RED);
   }
-  else if (y === 0 && x === 1){
+  if (y === 0 && x === 1){//blue
     grid[y][x] = BLUE;
     squarePicked = BLUE;
-    console.log(BLUE);
   }
-  else if (y === 1 && x === 0){
+   if (y === 1 && x === 0){//green
     grid[y][x] = GREEN;
     squarePicked = GREEN;
-    console.log(GREEN);
   }
-  else if (y === 1 && x === 1){
+  if (y === 1 && x === 1){//yellow
     grid[y][x] = YELLOW;
     squarePicked = YELLOW;
-    console.log(YELLOW);
+    // -----------------
+  }
+
+  // ------3x3 colors------
+  // Orange
+  if (y === 0 && x === 2){
+    grid[y][x] = ORANGE;
+    squarePicked = ORANGE;
+  }
+  // Cyan
+  if (y === 1 && x === 2){
+    grid[y][x] = CYAN;
+    squarePicked = CYAN;
+  }
+  // Purple
+  if (y === 2 && x === 0){
+    grid[y][x] = PURPLE;
+    squarePicked = PURPLE;
+  }
+  // Pink
+  if (y === 2 && x === 1){
+    grid[y][x] = PINK;
+    squarePicked = PINK;
+  }
+  // Brown
+  if (y === 2 && x === 2){
+    grid[y][x] = BROWN;
+    squarePicked = BROWN;
   }
 }
 
 function randomCombo(){
-  // Choose a random color to push into the combination
-  if (rightSquare){
-    let nextColor = random([RED, BLUE, GREEN, YELLOW]);
-    combination.push(nextColor);
-    // Reset variables
-    playerStep = 0;
-    wordText = nextColor;
-    isFlashing = true;
-    flashStep = 0;
-    flashTimer = millis();
+  let nextColor;
+  // Choose a random color to push into the combination based on grid size
+  if (grid.length === 2){
+    nextColor = random([RED, BLUE, GREEN, YELLOW]);
   }
+  if (grid.length === 3){
+    nextColor = random([RED, BLUE, GREEN, YELLOW, ORANGE, CYAN, PURPLE, PINK, BROWN]);
+  }
+  combination.push(nextColor);
+  // Reset variables
+  playerStep = 0;
+  wordText = 'Watch!';
+  isFlashing = true;
+  flashStep = 0;
+  flashTimer = millis();
 }
 
 function correctSquare(x,y){
-  console.log(combination[playerStep]);
   if (grid[y][x] === combination[playerStep]){
     rightSquare = true;
   }
@@ -170,7 +244,7 @@ function correctSquare(x,y){
 
 function checkColorFlashTime(){
   if (activeSquare !== null && millis() - flashStartTime >= flashDuration){
-    grid[activeSquare.y][activeSquare.x] = 0;
+    grid[activeSquare.y][activeSquare.x] = '0';
     activeSquare = null;
   }
 }
@@ -178,28 +252,29 @@ function checkColorFlashTime(){
 function resetGame(){
   clearGrid();
   activeSquare = null;
+  score = 0;
   combination = [];
-  playerStep = 0;
-  let nextColor = random([RED, BLUE, GREEN, YELLOW]);
-  combination.push(nextColor);
-  wordText = nextColor;
-  isFlashing = true;
-  flashStep = 0;
-  flashTimer = millis();
-
+  randomCombo();
 }
 
 function flashCombination(){
   if (!isFlashing){
+    lastFlashedStep = -1;
     return null;
   }
   let timeElapsed = millis() - flashTimer;
   let whichColor = combination[flashStep];
 
   if (timeElapsed < 750){
+    if (lastFlashedStep !== flashStep){
+      playColorSound(whichColor);
+      lastFlashedStep = flashStep;
+    }
+
     if (whichColor === RED){
       grid[0][0] = RED;
     }
+
     if (whichColor === BLUE){
       grid[0][1] = BLUE;
     }
@@ -208,6 +283,22 @@ function flashCombination(){
     }
     if (whichColor === YELLOW){
       grid[1][1] = YELLOW;
+    }
+    // ------3x3 colors------
+    if (whichColor === ORANGE){
+      grid[0][2] = ORANGE;
+    }
+    if (whichColor === CYAN){
+      grid[1][2] = CYAN;
+    }
+    if (whichColor === PURPLE){
+      grid[2][0] = PURPLE;
+    }
+    if (whichColor === PINK){
+      grid[2][1] = PINK;
+    }
+    if (whichColor === BROWN){
+      grid[2][2] = BROWN;
     }
   }
   else if (timeElapsed < 1000){
@@ -219,6 +310,7 @@ function flashCombination(){
 
     if (flashStep >= combination.length){
       isFlashing = false;
+      wordText = 'Your turn!';
     }
   }
 }
@@ -232,14 +324,82 @@ function checkNextRoundDelay(){
   }
 }
 
-function clearGrid(){
-  // Resets grid to full white
-  grid = [[0,0], [0,0]];
+function clearGrid() {
+  grid = []; //Make grid empty
+  
+  for (let y = 0; y < currentGridLines.length; y++) {
+    let row = []; // Create a new empty row
+    let line = currentGridLines;
+    
+    for (let x = 0; x < line.length; x++) {
+      row.push(line[y][x]); //Grab each character
+    }    
+    grid.push(row); //Push row into grid
+  }
+  squareSize = min(windowWidth,windowHeight) / grid.length;
 }
+
 
 function showText(){
   // Shows text with preferences
   fill(0);
+  // Watch!, Good job!, Your turn! text
   textSize(50);
-  text(`${wordText}`, width/2, height/2);
+  text(`${wordText}`, grid.length * squareSize + width/10, height/2);
+
+  textSize(30);
+  text(`Score: ${score}`, grid.length * squareSize + width/10, height/3);//Score text
+  text(`High Score: ${highscore}`,grid.length * squareSize + width/10, height/3.5); // High score text
+
+  // Mode swap instructions
+  text("Press 2 for 2x2 mode", grid.length * squareSize + width/10, height/6);
+  text("Press 3 for 3x3 mode", grid.length * squareSize + width/10, height/4.5);
+
+}
+
+function keyPressed(){
+  if (key === '2'){
+    currentGridLines = firstGridlines;
+    resetGame();
+  }
+  if (key === '3'){
+    currentGridLines = secondGridLines;
+    resetGame();
+  }
+}
+
+function playColorSound(color) {
+  // Give every color a playback speed, so I only use 1 file
+  if (color === RED){
+    clickSound.rate(0.8);
+  }
+  
+  if (color === BLUE){
+    clickSound.rate(0.9);
+  }
+  if (color === GREEN){
+    clickSound.rate(1.0);
+  }
+  if (color === YELLOW){
+    clickSound.rate(1.1);
+  }
+  if (color === ORANGE){
+    clickSound.rate(1.2);
+  }
+  if (color === CYAN){ 
+    clickSound.rate(1.3);
+  }
+  if (color === PURPLE){ 
+    clickSound.rate(1.4);
+  }
+  if (color === PINK){ 
+    clickSound.rate(1.5);
+  }
+  if (color === BROWN){
+    clickSound.rate(1.6)
+  }
+  if (clickSound.isPlaying()){
+    clickSound.stop();
+  }
+  clickSound.play();
 }
