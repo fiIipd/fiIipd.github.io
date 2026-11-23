@@ -3,7 +3,7 @@
 // November 22 2026
 //
 // Extra for Experts:
-// - I loaded my 2x2 and 3x3 grids from external text files, I explored using .rate() on my sound file so I could get all 9 sounds from 1 file,
+// - I loaded my 2x2 and 3x3 grids from external text files, I explored using .rate() on my sound file so I could get all 9 notes from 1 file,
 // I expanded my knowledge of millis() to make it flash colors and not repeat the sound effects 60 times per second,
 //  I used the min() function instead of if/else to find the biggest squares possible,
 // Added the option to instantly switch modes and rebuild the grid with new colors
@@ -26,13 +26,12 @@ let grid = [];
 
 let combination = [];
 let squareSize;
-let squareColor;
 let squarePicked;
 let wordText;
 let rightSquare = false;
 let playerStep = 0;
 
-let isFlashing = true;;
+let isFlashing = true;
 let flashTimer = 0;
 let flashStep = 0;
 let flashStartTime = 0;
@@ -54,6 +53,9 @@ let highscore = 0;
 let clickSound;
 let wrongSound;
 let lastFlashedStep = -1;
+
+let isWrongDelay = false;
+let wrongDelayTime = 0;
 async function setup() {
   firstGrid = "2x2.txt";
   secondGrid = "3x3.txt";
@@ -67,13 +69,14 @@ async function setup() {
   clearGrid();
   createCanvas(windowWidth, windowHeight);
   squareSize = min(windowWidth,windowHeight) / grid.length;
-  randomCombo();
+  randomCombo();//Randomize first color in sequence
 }
 
 function draw() {
   background(220);
   checkColorFlashTime();
   checkNextRoundDelay();
+  checkWrongDelay();
   flashCombination();
   showGrid();
   showText();
@@ -126,17 +129,17 @@ function showGrid(){
 
 function mousePressed(){
   // If colors flashing or waiting for the next round, clicks do nothing
-  if (isFlashing || waitingForRound){
+  if (isFlashing || waitingForRound || isWrongDelay){
     return null;
   }
 
-  // Find where the player is clicking
+  // Find where the player is clicking and convert into rows/columns
   let x = Math.floor(mouseX/squareSize);
   let y = Math.floor(mouseY/squareSize);
 
 
   if (x >= 0 && x < grid[0].length && y >= 0 && y < grid.length){ //Only allow clicking inside of squares
-    // If active square is not empty
+    // Reset previous clicked square to white if player clicks multiple squares fast
     if (activeSquare !== null){
       grid[activeSquare.y][activeSquare.x] = '0';
     }
@@ -144,28 +147,29 @@ function mousePressed(){
   
     activeSquare = {x: x, y: y}; // Make active square wherever you clicked
     flashStartTime = millis();
+
+    // Validate the players move
     correctSquare(x,y);
     checkPlayerChoice();
   }
 }
 
 function changeColor(x,y){
-  // Check what square is pressed and set the color value for showGrid()
-
+  // Check what square is pressed and set the color value for showGrid() and record which color was picked
   // ------2x2 colors------
-  if (y === 0 && x === 0){//Red
+  if (y === 0 && x === 0){
     grid[y][x] = RED;
     squarePicked = RED;
   }
-  if (y === 0 && x === 1){//blue
+  if (y === 0 && x === 1){
     grid[y][x] = BLUE;
     squarePicked = BLUE;
   }
-   if (y === 1 && x === 0){//green
+   if (y === 1 && x === 0){
     grid[y][x] = GREEN;
     squarePicked = GREEN;
   }
-  if (y === 1 && x === 1){//yellow
+  if (y === 1 && x === 1){
     grid[y][x] = YELLOW;
     squarePicked = YELLOW;
     // -----------------
@@ -208,8 +212,9 @@ function randomCombo(){
   if (grid.length === 3){
     nextColor = random([RED, BLUE, GREEN, YELLOW, ORANGE, CYAN, PURPLE, PINK, BROWN]);
   }
-  combination.push(nextColor);
-  // Reset variables
+  combination.push(nextColor);//Send into combination
+
+  // Reset variables and start flashing new sequence
   playerStep = 0;
   wordText = 'Watch!';
   isFlashing = true;
@@ -218,6 +223,7 @@ function randomCombo(){
 }
 
 function correctSquare(x,y){
+  // Check if the clicked square matches the same color in the sequence
   if (grid[y][x] === combination[playerStep]){
     rightSquare = true;
   }
@@ -227,6 +233,7 @@ function correctSquare(x,y){
 }
 
 function checkColorFlashTime(){
+  // Turn off the players clicked square after flashDuration (aka 750ms)
   if (activeSquare !== null && millis() - flashStartTime >= flashDuration){
     grid[activeSquare.y][activeSquare.x] = '0';
     activeSquare = null;
@@ -234,6 +241,7 @@ function checkColorFlashTime(){
 }
 
 function resetGame(){
+  //Reset board, score, and sequence to start a new game
   clearGrid();
   activeSquare = null;
   score = 0;
@@ -242,6 +250,7 @@ function resetGame(){
 }
 
 function flashCombination(){
+  // Step through the combination and flash each color with audio
   if (!isFlashing){
     lastFlashedStep = -1;
     return null;
@@ -249,12 +258,14 @@ function flashCombination(){
   let timeElapsed = millis() - flashTimer;
   let whichColor = combination[flashStep];
 
+  // Flash color and play sound one time during the first 750ms
   if (timeElapsed < 750){
     if (lastFlashedStep !== flashStep){
       playColorSound(whichColor);
       lastFlashedStep = flashStep;
     }
 
+    // ----2x2 colors-----
     if (whichColor === RED){
       grid[0][0] = RED;
     }
@@ -268,6 +279,7 @@ function flashCombination(){
     if (whichColor === YELLOW){
       grid[1][1] = YELLOW;
     }
+
     // ------3x3 colors------
     if (whichColor === ORANGE){
       grid[0][2] = ORANGE;
@@ -285,9 +297,12 @@ function flashCombination(){
       grid[2][2] = BROWN;
     }
   }
+  //Pause of 250ms with blank grid between flashes so repeated colors are visible
   else if (timeElapsed < 1000){
     clearGrid();
   }
+
+  // Advance to the next step in the combination, or let the player make their choice
   else {
     flashStep++;
     flashTimer = millis();
@@ -300,6 +315,7 @@ function flashCombination(){
 }
 
 function checkNextRoundDelay(){
+  // Wait 1 second after completing a round before starting the next sequence of colors
   if (waitingForRound && millis() - roundDelayTime >= 1000){
     waitingForRound = false;
     clearGrid();
@@ -309,22 +325,22 @@ function checkNextRoundDelay(){
 }
 
 function clearGrid() {
+  //Rebuild the 2D grid array from the loaded text files
   grid = []; //Make grid empty
   
+  // Go through everything
   for (let y = 0; y < currentGridLines.length; y++) {
-    let row = []; // Create a new empty row
-    let line = currentGridLines;
-    
-    for (let x = 0; x < line.length; x++) {
-      row.push(line[y][x]); //Grab each character
+    let row = []; // Create a new empty row  
+    for (let x = 0; x < currentGridLines.length; x++) {
+      row.push(currentGridLines[y][x]); //Grab each character
     }    
     grid.push(row); //Push row into grid
   }
-  squareSize = min(windowWidth,windowHeight) / grid.length;
+  squareSize = min(windowWidth,windowHeight) / grid.length;//find the biggest squareSize can be and set it
 }
 
 
-function showText(){
+function showText(){  
   // Shows text with preferences
   fill(0);
   // Watch!, Good job!, Your turn! text
@@ -333,6 +349,7 @@ function showText(){
 
   textSize(30);
   text(`Score: ${score}`, grid.length * squareSize + width/10, height/3);//Score text
+
   text(`High Score: ${highscore}`,grid.length * squareSize + width/10, height/3.5); // High score text
 
   // Mode swap instructions
@@ -342,18 +359,21 @@ function showText(){
 }
 
 function keyPressed(){
+  // Switch between 2x2 and 3x3 modes and rebuild game
   if (key === '2'){
+    isWrongDelay = false;
     currentGridLines = firstGridlines;
     resetGame();
   }
   if (key === '3'){
+    isWrongDelay = false;
     currentGridLines = secondGridLines;
     resetGame();
   }
 }
 
 function playColorSound(color) {
-  // Give every color a playback speed, so I only use 1 file
+  // Give every color a playback pitch, so I only use 1 file to make 9 notes
   if (color === RED){
     clickSound.rate(0.8);
   }
@@ -380,8 +400,10 @@ function playColorSound(color) {
     clickSound.rate(1.5);
   }
   if (color === BROWN){
-    clickSound.rate(1.6)
+    clickSound.rate(1.6);
   }
+
+  // Restart sound cleanly if triggered rapidly
   if (clickSound.isPlaying()){
     clickSound.stop();
   }
@@ -389,13 +411,18 @@ function playColorSound(color) {
 }
 
 function checkPlayerChoice(){
+  // Handle correct vs incorrect player clicks
   if (rightSquare){
     playColorSound(squarePicked);
     playerStep++;//Next step to click
-    if (playerStep >= combination.length){//Check if player clicked through whole combo
+
+    //Check if player clicked through whole combo for this round, and start waiting for next round
+    if (playerStep >= combination.length){
       waitingForRound = true;
       roundDelayTime = millis();
       wordText = 'Good job!';
+
+      // Set score and highscore
       score++;
       if (score > highscore){
         highscore = score;
@@ -403,7 +430,18 @@ function checkPlayerChoice(){
     }
   }
   else {
+  // If the wrong square is clicked, play buzzer and reset game
     wrongSound.play();
+    isWrongDelay = true;
+    wrongDelayTime = millis();
+    resetGame();
+  }
+}
+
+function checkWrongDelay(){
+  // Wait 1500ms/ 1.5 seconds after you get it wrong before flashing again
+  if(isWrongDelay && millis() - wrongDelayTime >= 1500){
+    isWrongDelay = false;
     resetGame();
   }
 }
