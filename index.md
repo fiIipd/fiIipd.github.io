@@ -18,6 +18,7 @@
 - [setTimeout](set-timeout)
 - [setInterval](set-interval)
 - [2D Arrays project](2d-arrays)
+- [Walker OOP](walker)
 
 ## Projects
 - [Interactive Scene](scene)
