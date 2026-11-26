@@ -17,9 +17,10 @@
 - [Character Demo](character)
 - [setTimeout](set-timeout)
 - [setInterval](set-interval)
-- [2D Arrays project](2d-arrays)
 - [Walker OOP](walker)
+- [Fireworks](fireworks)
 
 ## Projects
 - [Interactive Scene](scene)
 - [Arrays and Object Notation](array-objects)
+- [2D Arrays project](2d-arrays)
